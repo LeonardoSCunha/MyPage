@@ -351,3 +351,7 @@ html[data-theme="dark"] .icon-sun  { display: block; }
   .js .reveal { opacity: 1; transform: none; transition: none; }
   .project-card, .skill, .btn { transition: none; }
 }
+
+.form-status { font-size: .9rem; margin-top: .8rem; min-height: 1.2em; }
+.form-status.ok { color: var(--accent-text); }
+.form-status.err { color: #d9534f; }
