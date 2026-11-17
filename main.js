@@ -96,18 +96,40 @@
   /* ============================================================
      Formulário → abre o app de e-mail (sem backend)
      ============================================================ */
+    /* ============================================================
+     Formulário → Web3Forms
+     ============================================================ */
   var form = document.getElementById('contact-form');
-  var EMAIL_DESTINO = 'leonardosantosdacunha@gmail.com'; // edite se necessário
   if (form) {
+    var statusEl = document.getElementById('form-status');
+    var submitBtn = form.querySelector('button[type="submit"]');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      var nome = document.getElementById('nome').value.trim();
-      var email = document.getElementById('email').value.trim();
-      var msg = document.getElementById('mensagem').value.trim();
-      if (!nome || !email || !msg) return;
-      var assunto = encodeURIComponent('Contato pelo site — ' + nome);
-      var corpo = encodeURIComponent('Nome: ' + nome + '\nE-mail: ' + email + '\n\n' + msg);
-      window.location.href = 'mailto:' + EMAIL_DESTINO + '?subject=' + assunto + '&body=' + corpo;
+      var label = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando…';
+      statusEl.textContent = '';
+      statusEl.className = 'form-status';
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form)))
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (!res.success) throw new Error(res.message);
+          form.reset();
+          statusEl.textContent = 'Mensagem enviada! Responderei em breve.';
+          statusEl.className = 'form-status ok';
+        })
+        .catch(function () {
+          statusEl.textContent = 'Não foi possível enviar. Tente novamente ou copie meu e-mail no rodapé.';
+          statusEl.className = 'form-status err';
+        })
+        .then(function () {
+          submitBtn.disabled = false;
+          submitBtn.textContent = label;
+        });
     });
   }
 /* ============================================================
